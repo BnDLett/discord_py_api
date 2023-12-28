@@ -1,4 +1,5 @@
 import requests, json
+from requests import Response
 
 
 class User:
@@ -9,11 +10,11 @@ class User:
         self.__data = {"Authorization": token}
         token = None
 
-    def type(self, channel: str) -> int:
+    def type(self, channel: str) -> Response:
         r = requests.post(f"https://discord.com/api/v9/channels/{channel}/typing", headers=self.__data)
         return r
 
-    def send_message(self, channel: str, message: str) -> int:
+    def send_message(self, channel: str, message: str) -> Response:
         json = {"content": message, "tts": False, "flags": 0}
 
         r = requests.post(f"https://discord.com/api/v9/channels/{channel}/messages", headers=self.__data, json=json)

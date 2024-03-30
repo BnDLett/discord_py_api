@@ -1,14 +1,64 @@
-import requests, json
+import json
+import time
+import requests
+# import websocket
 from requests import Response
+
+# wss://gateway.discord.gg/?encoding=json&v=9&compress=zlib-stream
+
+
+class Debug:
+    INFO = "INFO"
+    DEBUG = "DEBUG"
+
+    def __init__(self, debug: bool):
+        self.debug = debug
+        self.start_time = time.time()
+
+    def message(self, level: str, message: str):
+        if self.debug is None:
+            return
+
+        elif level == self.INFO:
+            print(f"[{(time.time() - self.start_time):.3f}] [{level}]: {message}")
+            return
+
+        elif not self.debug:
+            return
+
+        print(f"[{(time.time() - self.start_time):.3f}] [{level}]: {message}")
 
 
 class User:
-    def __init__(self, token: str = None, username: str = None, password: str = None, auth_code: str = None) -> None:
+    def __init__(self, id: str, username: str, display_name: str, avatar: str):
+        self.id = id
+        self.username = username
+        self.display_name = display_name
+        self.avatar = avatar
+
+
+class Message:
+    def __init__(self, content: str, message_id: str, author: User):
+        """
+        A class for Discord messages.
+        :param content: The content of the message.
+        :param message_id: The ID of the message.
+        :param author: The author of the message.
+        """
+        self.content = content
+        self.message_id = message_id
+        self.author = author
+
+
+class Client:
+    def __init__(self, token: str = None, username: str = None, password: str = None, auth_code: str = None,
+                 debug: bool = None) -> None:
         if token is None:
             token = self.authenticate(username, password, auth_code)
 
         self.__data = {"Authorization": token}
         token = None
+        self.debugger = Debug(debug)
 
     def type(self, channel: str) -> Response:
         r = requests.post(f"https://discord.com/api/v9/channels/{channel}/typing", headers=self.__data)
@@ -22,11 +72,25 @@ class User:
 
     def get_messages(self, channel: str, limit: int = 1) -> list:
         r = requests.get(f"https://discord.com/api/v9/channels/{channel}/messages?limit={limit}",
-                         headers=self.__data).content
+                         headers=self.__data)
 
-        messages: list = json.loads(r)
+        self.debugger.message(self.debugger.INFO, str(r.status_code))
+        json_messages: list = json.loads(r.content)
+        message_list = []
 
-        return messages
+        for message in json_messages:
+            message_list.append(Message(
+                message['content'],
+                message['id'],
+                User(
+                    message['author']['id'],
+                    message['author']['username'],
+                    message['author']['global_name'],
+                    message['author']['avatar']
+                )
+            ))
+
+        return message_list
 
     @staticmethod
     def authenticate(username: str, password: str, auth_code: str = None) -> str:
@@ -45,20 +109,23 @@ class User:
 
         return __token
 
+
 if __name__ == "__main__":
     import maskpass
 
-    username = input("Enter username:\n> ")
-    password = maskpass.askpass("Enter password:\n> ", '*')
-    code = input("Enter auth code (leave blank if there is none):\n> ")
+    # username = input("Enter username:\n> ")
+    # password = maskpass.askpass("Enter password:\n> ", '*')
+    # code = input("Enter auth code (leave blank if there is none):\n> ")
 
-    if code == "".strip(): code = None
+    # if code == "".strip(): code = None
 
-    user = User(username=username, password=password, auth_code=code)
+    # user = User(username=username, password=password, auth_code=code)
+    input_token = maskpass.askpass("Enter token:\n> ", '*')
+    user = Client(token=input_token, debug=True)
 
     channel = input("Please enter a channel ID:\n> ")
-    messages = user.get_messages(channel, limit=10)
+    messages: list[Message] = user.get_messages(channel, limit=10)
     messages.reverse()
 
     for x in messages:
-        print(f"[{x['author']['username']}]: {x['content']}")
+        print(f"[{x.author.display_name if x.author.display_name is not None else x.author.username}]: {x.content}")

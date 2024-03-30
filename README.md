@@ -1,5 +1,5 @@
 # discord_py_api
-An API between Discord and Python. Current version: v1.0.0.
+An API between Discord and Python. Current version: v1.0.1d.
 
 # What is it about?
 discord_py_api is a library that allows Python applications to communicate with Discord's API. 

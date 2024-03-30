@@ -1,8 +1,12 @@
+import asyncio
 import json
+import os
 import time
+import zlib
 import requests
-# import websocket
+import websockets
 from requests import Response
+
 
 # wss://gateway.discord.gg/?encoding=json&v=9&compress=zlib-stream
 
@@ -129,3 +133,44 @@ if __name__ == "__main__":
 
     for x in messages:
         print(f"[{x.author.display_name if x.author.display_name is not None else x.author.username}]: {x.content}")
+
+
+# async def loop(ws: websockets.WebSocketClientProtocol, messages: list):
+#     while True:
+#         x = await ws.recv()
+#         messages.append(x)
+#         os.system("clear")
+#         for compressed in messages:
+#             decompress_obj = zlib.decompressobj()
+#             # try:
+#             #     message = decompress_obj.decompress(compressed)
+#             # except Exception as e:
+#             #     message = e
+#             message = compressed
+#             print(message)
+#
+#
+# async def main(token: str):
+#     async with websockets.connect('wss://gateway.discord.gg/?encoding=json&v=9') as ws:
+#         payload = json.dumps({'op': 2, 'd': {'token': token, 'capabilities': 16381, "compress": False}})
+#         second_payload = json.dumps({"op": 37, "d": {"subscriptions": {"868121354698903592":
+#                                                                            {"channels": {"1215297993515991081":
+#                                                                                              [[0, 99]]
+#                                                                                          }}}}})
+#         x = await ws.send(payload)
+#         await ws.send(second_payload)
+#         messages = []
+#
+#         while True:
+#             try:
+#                 await loop(ws, messages)
+#             except Exception as e:
+#                 print(e)
+#                 continue
+#
+#
+# if __name__ == '__main__':
+#     import maskpass
+#
+#     input_token = maskpass.askpass("Enter token:\n> ", '*')
+#     asyncio.run(main(input_token))

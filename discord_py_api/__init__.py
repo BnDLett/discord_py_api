@@ -1,3 +1,3 @@
-from discord_py_api.Client import Client
-from discord_py_api.Message import Message
-from discord_py_api.User import User
+from .Client import Client
+from .Message import Message
+from .User import User

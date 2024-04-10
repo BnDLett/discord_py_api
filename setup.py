@@ -2,8 +2,8 @@ from setuptools import setup
 
 setup(
     name='discord-py-api',
-    packages=['discord_py_api'],
-    version='2.0.2',
+    py_scipts=['discord_py_api'],
+    version='2.0.3',
     description='An API written in Python for Discord.',
     author='Lett',
     install_requires=[

@@ -10,5 +10,6 @@ setup(
         'requests~=2.31.0',
         'maskpass~=0.3.7',
         'setuptools~=68.2.0',
+        'websockets~=12.0',
     ],
 )

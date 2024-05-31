@@ -4,3 +4,4 @@ class User:
         self.username = username
         self.display_name = display_name
         self.avatar = avatar
+        # TODO: Add status variable.
